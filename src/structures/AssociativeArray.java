@@ -49,6 +49,16 @@ public class AssociativeArray<K, V> {
     this.size = 0;
   } // AssociativeArray()
 
+  /**
+   * Create a new array with given pairs, size.
+   * @param pairs
+   * @param size
+   */
+  public AssociativeArray(KVPair<K, V> pairs[], int size) {
+    this.pairs = pairs;
+    this.size = size;
+  } // AssociativeArray
+
   // +------------------+--------------------------------------------
   // | Standard Methods |
   // +------------------+
@@ -57,14 +67,29 @@ public class AssociativeArray<K, V> {
    * Create a copy of this AssociativeArray.
    */
   public AssociativeArray<K, V> clone() {
-    return null; // STUB
+    KVPair<K, V> cloned[] = (KVPair<K, V>[]) newInstance((new KVPair<K, V>()).getClass(),
+    DEFAULT_CAPACITY);
+    for(int i = 0; i < pairs.length; i++) {
+      cloned[i] = pairs[i];
+    }
+    return new AssociativeArray(cloned, this.size);
   } // clone()
 
   /**
    * Convert the array to a string.
    */
   public String toString() {
-    return "{}"; // STUB
+    if(size == 0) {
+      return "{}";
+    }
+    else{
+      String result = "{ " + pairs[0].key.toString() + ": " + pairs[0].value.toString();
+      for(int i = 1; i < size; i++) {
+        result += ", " + pairs[i].key.toString() + ": " + pairs[i].value.toString();
+      }
+      result += " }";
+      return result;
+    }
   } // toString()
 
   // +----------------+----------------------------------------------
@@ -76,7 +101,23 @@ public class AssociativeArray<K, V> {
    * get(key) will return value.
    */
   public void set(K key, V value) throws NullKeyException {
-    // STUB
+    if(key.equals(null)) {
+      throw new NullKeyException();
+    }
+    else {
+      KVPair<K, V> temp = new KVPair(key, value);
+      try {
+        int index = find(key);
+        pairs[index] = temp;
+      }
+      catch (Exception e) {
+        pairs[size] = temp;
+        size++;
+        if(size == pairs.length) {
+          expand();
+        }
+      }
+    }
   } // set(K,V)
 
   /**
@@ -87,7 +128,13 @@ public class AssociativeArray<K, V> {
    *                              appear in the associative array.
    */
   public V get(K key) throws KeyNotFoundException {
-    return null; // STUB
+    try {
+      int index = find(key);
+      return pairs[index].value;
+    }
+    catch (Exception e) {
+      throw new KeyNotFoundException();
+    }
   } // get(K)
 
   /**
@@ -95,7 +142,13 @@ public class AssociativeArray<K, V> {
    * return false for the null key.
    */
   public boolean hasKey(K key) {
-    return false; // STUB
+    try {
+      find(key);
+      return true;
+    }
+    catch (Exception e) {
+      return false;
+    }
   } // hasKey(K)
 
   /**
@@ -104,7 +157,20 @@ public class AssociativeArray<K, V> {
    * in the associative array, does nothing.
    */
   public void remove(K key) {
-    // STUB
+    try {
+      int index = find(key);
+      if(index != size - 1) {
+        pairs[index] = pairs[size-1];
+        size--;
+      }
+      else{
+        pairs[index] = null;
+        size--;
+      }
+    }
+    catch (Exception e) {
+
+    }
   } // remove(K)
 
   /**
@@ -129,8 +195,13 @@ public class AssociativeArray<K, V> {
    * Find the index of the first entry in `pairs` that contains key.
    * If no such entry is found, throws an exception.
    */
-  public int find(K key) throws KeyNotFoundException {
-    throw new KeyNotFoundException();   // STUB
+  public int find(K k) throws KeyNotFoundException {
+    for(int i = 0; i < size; i++) {
+      if(pairs[i].key.equals(k)) {
+        return i;
+      }
+    }
+    throw new KeyNotFoundException();
   } // find(K)
 
 } // class AssociativeArray
